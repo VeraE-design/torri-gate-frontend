@@ -1,5 +1,5 @@
 import axios from "axios";
 
 export const axiosInstance = axios.create({
-  baseURL: "",
+  baseURL: "https://torii-backend-server.onrender.com/api",
 });
