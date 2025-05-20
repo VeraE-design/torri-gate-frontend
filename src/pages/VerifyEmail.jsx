@@ -9,7 +9,7 @@ const VerifyEmail = () => {
   const [errorMsg, setErrorMsg] = useState("");
   const [status, setStatus] = useState("verifying");
   const [email, setEmail] = useState("");
-  const [feedback, setFeedback] = useState("");
+  const [feedback, setFeedback] = useState("");g
   const handleResendEmail = async () => {
     try {
       const response = await axiosInstance.post("/auth/resend-email", {
@@ -25,7 +25,7 @@ const VerifyEmail = () => {
   };
   const checkToken = async () => {
     try {
-      const response = await axiosInstance.post(/auth/verify-email/${token}, {
+      const response = await axiosInstance.post(`/auth/verify-email/${token}`, {
         token,
       });
       if (response.status === 200) {
