@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { use, useState } from "react";
 import logo from "../assets/blacklogo.png";
 import { Link, useNavigate } from "react-router-dom";
 import AuthWrapper from "../components/layout/AuthWrapper";
@@ -8,13 +8,15 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { loginSchema } from "../utils/formValidator";
 import { axiosInstance } from "../utils/axiosInstance";
+import { useAppContext } from "../hooks/useAppContext";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [role, setRole] = useState("tenant");
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const redirect = useNavigate();
+  const { login } = useAppContext();
 
   const {
     register,
@@ -24,12 +26,27 @@ const Login = () => {
     resolver: yupResolver(loginSchema),
   });
 
-  const handleLogin = (data) => {
+  const handleLogin = async (data) => {
     setIsSubmitting(true);
     try {
-      console.log("Login Data:", { ...data, role });
+      // console.log("Login Data:", { ...data, role });
+      const { data: mydata } = await axiosInstance.post("/auth/login", {
+        ...data,
+        role,
+      });
+      console.log(mydata);
+      login(mydata.token, mydata.user);
+      if (mydata.user.role === "tenant") {
+        redirect("/home");
+      } else {
+        redirect("/dashboard");
+      }
+      setErrorMessage("");
     } catch (error) {
       console.log(error);
+      setErrorMessage(error?.response?.data?.message || "Login Failed");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -130,16 +147,23 @@ const Login = () => {
               <p>{errorMessage}</p>
             </div>
           )}
-          <Link to="/forgot-password" className="font-medium text-sm mt-2 inline-block">
+          <Link
+            to="/forgot-password"
+            className="font-medium text-sm mt-2 inline-block"
+          >
             Forgot Password?
           </Link>
 
           <button
             type="submit"
-            disabled={isSubmitting}
             className="btn w-full h-[56px] rounded-lg bg-black text-white block mt-5"
+            disabled={isSubmitting}
           >
-            {isSubmitting ? <span className="loading loading-spinner loading-md"></span>: 'Login'}
+            {isSubmitting ? (
+              <span className="loading loading-spinner loading-md text-black"></span>
+            ) : (
+              "Login"
+            )}
           </button>
 
           <p className="my-5 text-center text-[#666]">
