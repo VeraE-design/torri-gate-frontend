@@ -6,6 +6,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { resetPasswordSchema } from "../utils/formValidator";
 import { PiWarningCircle } from "react-icons/pi";
+import { useParams, useNavigate } from "react-router-dom";
 import { useState } from "react";
 
 const ResetPassword = () => {
@@ -13,6 +14,9 @@ const ResetPassword = () => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { token } = useParams;
+  const redirect = useNavigate();
+
   const {
     register,
     handleSubmit,
@@ -20,10 +24,20 @@ const ResetPassword = () => {
   } = useForm({ resolver: yupResolver(resetPasswordSchema) });
 
   const handleResetPassword = async (data) => {
+    setIsSubmitting(true);
     try {
-      console.log(data);
+      const response = await axiosInstance.post("/auth/reset-password", {
+        token,
+        password: data.password,
+      });
+      if (response.status === 200) {
+        redirect("/login");
+      }
     } catch (error) {
       console.log(error);
+      setErrorMessage(error?.response?.data?.message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 

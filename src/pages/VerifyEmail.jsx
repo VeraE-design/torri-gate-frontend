@@ -9,7 +9,7 @@ const VerifyEmail = () => {
   const [errorMsg, setErrorMsg] = useState("");
   const [status, setStatus] = useState("verifying");
   const [email, setEmail] = useState("");
-  const [feedback, setFeedback] = useState("");g
+  const [feedback, setFeedback] = useState("");
   const handleResendEmail = async () => {
     try {
       const response = await axiosInstance.post("/auth/resend-email", {
